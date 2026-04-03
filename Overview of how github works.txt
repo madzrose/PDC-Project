@@ -1,0 +1,92 @@
+# GitHub Usage Overview
+
+## What is GitHub?
+
+GitHub is a platform used to store, manage, and collaborate on code using version control (Git). It allows multiple people to work on the same project without overwriting each other’s work.
+
+---
+
+## Basic Workflow
+
+### 1. Clone the Repository
+
+Each team member downloads the project to their computer using GitHub Desktop or Git:
+
+* This creates a local copy of the project
+
+---
+
+### 2. Create a Branch
+
+Instead of working directly on the main project:
+
+* Create a new branch for your work
+* Example branch names:
+
+  * `feature-login`
+  * `fix-navbar`
+  * `yourname-task`
+
+---
+
+### 3. Make Changes
+
+* Open the project in Visual Studio Code (or another editor)
+* Edit or add files
+* Save your work
+
+---
+
+### 4. Commit Changes
+
+A commit is a saved version of your work.
+
+* Add a short message describing what you did
+* Example:
+
+  * "Added homepage layout"
+  * "Fixed login bug"
+
+---
+
+### 5. Push to GitHub
+
+* Upload your commits to GitHub
+* This updates your branch online
+
+---
+
+### 6. Create a Pull Request
+
+* Request to merge your branch into the main branch
+* Teammates can review your work before it is added
+
+---
+
+### 7. Merge Changes
+
+* Once approved, your changes are merged into the main project
+
+---
+
+## Team Guidelines
+
+* Do not work directly on the `main` branch
+* Always pull the latest changes before starting work
+* Commit frequently with clear messages
+* Communicate with teammates about tasks
+
+---
+
+## Simple Workflow Summary
+
+Clone → Branch → Code → Commit → Push → Pull Request → Merge
+
+---
+
+## Why Use GitHub?
+
+* Keeps track of all changes
+* Prevents lost work
+* Makes collaboration easier
+* Allows version history and rollback if needed
