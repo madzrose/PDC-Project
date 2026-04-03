@@ -1,0 +1,55 @@
+1. Everyone Clones the Repo
+
+Each teammate downloads the project locally.
+
+Using GitHub Desktop:
+
+Click File → Clone repository
+Choose your repo
+Select a local folder
+Click Clone
+
+Then open that folder in Visual Studio Code
+
+
+2. Use Branches (VERY IMPORTANT)
+
+This prevents people from overwriting each other’s work.
+
+Rule:
+main = stable version
+Everyone works on their own branch
+Create a branch in GitHub Desktop:
+Click Current Branch → New Branch
+Name it like:
+feature-login
+fix-navbar
+john-backend
+
+3. Daily Workflow for Each Teammate
+Step-by-step:
+Open project in VS Code
+Make changes
+Save files
+
+Then in GitHub Desktop:
+
+Review changes
+
+Write commit message:
+
+Added login validation
+Click Commit
+Click Push origin
+4. Merge Work Together (Pull Requests)
+
+Instead of pushing directly to main:
+
+Steps:
+Push your branch
+Go to GitHub website
+Click “Compare & pull request”
+Teammates review
+Click Merge
+
+💡 This is how we can avoid breaking the project.
