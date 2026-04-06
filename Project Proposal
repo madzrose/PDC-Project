@@ -1,0 +1,15 @@
+Project Proposal 
+
+Our teams Idea was to do a Top-Down Shooter that represents parallel and distributed processes. We have yet to name the game for reference; we call it TDS. TDS is aimed at demonstrating the concepts of how workloads can be divided and optimized using mutli threading, while comparing strong and weak scaling systems in a real time environment.  
+
+Responsivities (As of right now) 
+
+Kaden Rondeau: Implement parallel processing as well as figuring how to add ai, strong scaling mode, weak scaling, CPU Usage, distribution, and certain tracking ( Fps,execution time). 
+
+ 
+
+Layne: Handles player input, updates, manage latency handling and data consistency. Assist with experiments. 
+
+ 
+
+Madeline: Build gameplay (Player movement, shooting mechanics, Collision detection), Create Ui, rendering, and backend systems. What the player sees and interacts with.  
