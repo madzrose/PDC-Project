@@ -7,3 +7,19 @@ Rather than building a full on 2d game with shaders and shapes... we perfer to f
 - Load Balancing
 - Strong vs Weak Scaling
 - Performance(FPS/Workload size)
+
+Responsibilities( For now )
+Kaden Rondeau – Systems & Parallel Processing
+Implemented threading simulation
+Developed scaling modes (strong & weak)
+Performance tracking (FPS, execution behavior)
+
+Layne – Input & Data Consistency
+Player input and responsiveness
+Latency handling and synchronization
+Assisted with system testing and experiments
+
+Madeline – Gameplay & UI
+Core gameplay mechanics (movement, shooting, collisions)
+UI and visualization systems
+Rendering and player interaction
