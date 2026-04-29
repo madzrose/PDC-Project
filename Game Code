@@ -1,0 +1,206 @@
+import pygame
+import sys
+import random
+
+pygame.init()
+
+# screen stuff
+WIDTH = 1280
+HEIGHT = 720 
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("TDS Prototype")
+
+clock = pygame.time.Clock()
+font = pygame.font.SysFont(None, 28)
+
+# player
+player = pygame.Rect(380, 500, 40, 20)
+speed = 4
+
+# enemies
+enemies = []
+spawn_time = 0
+
+# enemy bullets
+enemy_bullets = []
+
+# player bullets
+player_bullets = []
+
+# game state
+game_over = False
+
+# scaling mode
+scaling_mode = 2
+
+
+def move_player():
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_a]:
+        player.x -= speed
+    if keys[pygame.K_d]:
+        player.x += speed
+    if keys[pygame.K_w]:
+        player.y -= speed
+    if keys[pygame.K_s]:
+        player.y += speed
+
+
+def spawn_enemy():
+    global spawn_time
+    spawn_time += 1
+
+    # strong scaling
+    if scaling_mode == 2:
+        if spawn_time > 30:
+            x = random.randint(0, WIDTH - 40)
+            enemies.append(pygame.Rect(x, 0, 40, 40))
+            spawn_time = 0
+
+    # weak scaling
+    if scaling_mode == 1:
+        if spawn_time > 30:
+            x = random.randint(0, WIDTH - 40)
+            enemies.append(pygame.Rect(x, 0, 40, 40))
+            spawn_time = 0
+
+        if random.randint(1, 20) == 1:
+            x = random.randint(0, WIDTH - 40)
+            enemies.append(pygame.Rect(x, 0, 40, 40))
+
+
+def update_enemies():
+    for e in enemies:
+        e.y += 2
+
+        if random.randint(1, 120) == 1:
+            bullet = pygame.Rect(e.centerx, e.bottom, 6, 10)
+            enemy_bullets.append(bullet)
+
+    for e in enemies[:]:
+        if e.y > HEIGHT:
+            enemies.remove(e)
+
+
+def update_enemy_bullets():
+    for b in enemy_bullets:
+        b.y += 5
+
+    for b in enemy_bullets[:]:
+        if b.y > HEIGHT:
+            enemy_bullets.remove(b)
+
+
+def update_player_bullets():
+    for b in player_bullets:
+        b.y -= 7
+
+    for b in player_bullets[:]:
+        if b.y < 0:
+            player_bullets.remove(b)
+
+
+def game_collisions():
+    global game_over
+
+    for e in enemies:
+        if player.colliderect(e):
+            game_over = True
+
+    for b in enemy_bullets:
+        if player.colliderect(b):
+            game_over = True
+
+    
+    for b in player_bullets[:]:
+        for e in enemies[:]:
+            if b.colliderect(e):
+                player_bullets.remove(b)
+                enemies.remove(e)
+                break
+
+
+def draw():
+    screen.fill((30, 30, 30))
+
+    pygame.draw.rect(screen, (0, 255, 0), player)
+
+    for e in enemies:
+        pygame.draw.rect(screen, (255, 0, 0), e)
+
+    for b in enemy_bullets:
+        pygame.draw.rect(screen, (255, 200, 0), b)
+
+    
+    for b in player_bullets:
+        pygame.draw.rect(screen, (255, 255, 0), b)
+
+    screen.blit(font.render("TDS Prototype", True, (255,255,255)), (10, 10))
+    screen.blit(font.render("Green = Player", True, (255,255,255)), (10, 40))
+    screen.blit(font.render("Red = Mobs", True, (255,255,255)), (10, 70))
+
+    # scaling UI
+    mode_text = "Weak Scaling (1)" if scaling_mode == 1 else "Strong Scaling (2)"
+    screen.blit(font.render(f"Mode: {mode_text}", True, (255,255,255)), (10, 130))
+    screen.blit(font.render("Press 1 = Weak | Press 2 = Strong", True, (200,200,200)), (10, 160))
+
+    display_fps(screen, clock, font)
+
+    # game over
+    if game_over:
+        big_font = pygame.font.SysFont(None, 80)
+        text = big_font.render("GAME OVER", True, (255, 50, 50))
+        screen.blit(text, (WIDTH//2 - 200, HEIGHT//2 - 40))
+
+        
+        small = font.render("Press R to Restart", True, (255,255,255))
+        screen.blit(small, (WIDTH//2 - 120, HEIGHT//2 + 50))
+
+    pygame.display.flip()
+
+
+def display_fps(screen, clock, font):
+    fps_text = str(int(clock.get_fps()))
+    fps_surface = font.render(f"FPS: {fps_text}", True, pygame.Color("coral"))
+    screen.blit(fps_surface, (10,100))
+
+
+# main
+while True:
+    clock.tick(60)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_1:
+                scaling_mode = 1
+
+            if event.key == pygame.K_2:
+                scaling_mode = 2
+
+        
+            if event.key == pygame.K_SPACE and not game_over:
+                bullet = pygame.Rect(player.centerx, player.y, 6, 10)
+                player_bullets.append(bullet)
+
+            
+            if event.key == pygame.K_r and game_over:
+                enemies.clear()
+                enemy_bullets.clear()
+                player_bullets.clear()
+                player.x, player.y = 380, 500
+                game_over = False
+
+    if not game_over:
+        move_player()
+        spawn_enemy()
+        update_enemies()
+        update_enemy_bullets()
+        update_player_bullets()  
+        game_collisions()
+
+    draw()
