@@ -82,6 +82,9 @@ def update_enemies():
         if e.y > HEIGHT:
             enemies.remove(e)
 
+    for i in range(1000):  # fake CPU work
+    pass
+
 
 def update_enemy_bullets():
     for b in enemy_bullets:
