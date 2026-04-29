@@ -60,10 +60,11 @@ def spawn_enemy():
 
     # weak scaling
     if scaling_mode == 1:
-        if spawn_time > 30:
+    if spawn_time > 30:
+        for i in range(5):  # spawn 5 at once
             x = random.randint(0, WIDTH - 40)
             enemies.append(pygame.Rect(x, 0, 40, 40))
-            spawn_time = 0
+        spawn_time = 0
 
         if random.randint(1, 20) == 1:
             x = random.randint(0, WIDTH - 40)
