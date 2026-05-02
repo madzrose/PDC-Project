@@ -1,0 +1,261 @@
+import pygame
+import sys
+import random
+
+# SETUP 
+
+print("Choose Scaling Mode:")
+print("1 = Weak Scaling (slow increase)")
+print("2 = Strong Scaling (fast increase)")
+
+scaling_mode = 0
+while scaling_mode not in [1, 2]:
+    try:
+        scaling_mode = int(input("Enter 1 or 2: "))
+    except:
+        scaling_mode = 0
+
+pygame.init()
+pygame.font.init()
+
+WIDTH, HEIGHT = 1280, 720
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Top-Down Shooter Scaling Demo")
+
+clock = pygame.time.Clock()
+font = pygame.font.SysFont(None, 28)
+
+# player setup
+player = pygame.Rect(380, 500, 40, 20)
+
+# game objects
+enemies = []
+enemy_bullets = []
+player_bullets = []
+
+# game state
+spawn_timer = 0
+game_over = False
+game_started = False
+
+score = 0
+time_elapsed = 0
+difficulty = 0
+
+
+#  PLAYER MOVEMENT -
+def move_player(dt):
+    keys = pygame.key.get_pressed()
+    move_speed = 300
+
+    if keys[pygame.K_a]:
+        player.x -= int(move_speed * dt)
+    if keys[pygame.K_d]:
+        player.x += int(move_speed * dt)
+    if keys[pygame.K_w]:
+        player.y -= int(move_speed * dt)
+    if keys[pygame.K_s]:
+        player.y += int(move_speed * dt)
+
+
+# ENEMY SPAWNING 
+def spawn_enemy(dt):
+    global spawn_timer
+
+    spawn_timer += dt * 1000
+
+    # spawn rate increases as difficulty increases
+    spawn_interval = max(250, 1000 - difficulty * 150)
+
+    if spawn_timer >= spawn_interval:
+        new_enemy = pygame.Rect(random.randint(0, WIDTH - 40), 0, 40, 40)
+        enemies.append(new_enemy)
+        spawn_timer = 0
+
+
+# GAME UPDATES 
+def update_enemies():
+    for enemy in enemies:
+        enemy.y += 3  # constant movement speed
+
+        # randomly shoot
+        if random.randint(1, 120) == 1:
+            bullet = pygame.Rect(enemy.centerx, enemy.bottom, 6, 10)
+            enemy_bullets.append(bullet)
+
+    # remove enemies that leave screen
+    for enemy in enemies[:]:
+        if enemy.y > HEIGHT:
+            enemies.remove(enemy)
+
+    # simulate extra workload (for FPS drop demonstration)
+    for _ in range(len(enemies) * 50):
+        pass
+
+
+def update_enemy_bullets():
+    for bullet in enemy_bullets:
+        bullet.y += 5
+
+    for bullet in enemy_bullets[:]:
+        if bullet.y > HEIGHT:
+            enemy_bullets.remove(bullet)
+
+
+def update_player_bullets():
+    for bullet in player_bullets:
+        bullet.y -= 7
+
+    for bullet in player_bullets[:]:
+        if bullet.y < 0:
+            player_bullets.remove(bullet)
+
+
+# COLLISIONS
+def check_collisions():
+    global game_over, score
+
+    for enemy in enemies:
+        if player.colliderect(enemy):
+            game_over = True
+
+    for bullet in enemy_bullets:
+        if player.colliderect(bullet):
+            game_over = True
+
+    for bullet in player_bullets[:]:
+        for enemy in enemies[:]:
+            if bullet.colliderect(enemy):
+                player_bullets.remove(bullet)
+                enemies.remove(enemy)
+                score += 1
+                break
+
+
+# DRAW EVERYTHING 
+def draw():
+    if not game_started:
+        screen.fill((20, 20, 20))
+
+        big_font = pygame.font.SysFont(None, 60)
+        screen.blit(big_font.render("TDS Scaling Demo", True, (255, 255, 255)), (WIDTH//2 - 180, 200))
+
+        screen.blit(font.render("Press ENTER to Start", True, (200, 200, 200)), (WIDTH//2 - 130, 300))
+        screen.blit(font.render("WASD to move | SPACE to shoot", True, (200, 200, 200)), (WIDTH//2 - 180, 340))
+
+        pygame.display.flip()
+        return
+
+    screen.fill((30, 30, 30))
+
+    # draw player
+    pygame.draw.rect(screen, (0, 255, 0), player)
+
+    # draw enemies
+    for enemy in enemies:
+        pygame.draw.rect(screen, (255, 0, 0), enemy)
+
+    # draw bullets
+    for bullet in enemy_bullets:
+        pygame.draw.rect(screen, (255, 200, 0), bullet)
+
+    for bullet in player_bullets:
+        pygame.draw.rect(screen, (255, 255, 0), bullet)
+
+    # UI info
+    screen.blit(font.render(f"Enemies: {len(enemies)}", True, (230, 230, 230)), (8, 35))
+    screen.blit(font.render(f"Score: {score}", True, (230, 230, 230)), (8, 60))
+
+    mode_text = "Weak Scaling" if scaling_mode == 1 else "Strong Scaling"
+    screen.blit(font.render(mode_text, True, (200, 200, 200)), (8, 95))
+
+    display_fps()
+
+    # game over screen
+    if game_over:
+        pygame.draw.rect(screen, (50, 50, 50), (WIDTH//2 - 170, HEIGHT//2 - 30, 340, 120))
+
+        screen.blit(pygame.font.SysFont(None, 70).render("Game Over", True, (255, 60, 60)),
+                    (WIDTH//2 - 150, HEIGHT//2 - 20))
+
+        screen.blit(font.render("Press R to restart", True, (200, 200, 200)),
+                    (WIDTH//2 - 130, HEIGHT//2 + 40))
+
+    pygame.display.flip()
+
+
+#FPS DISPLAY 
+def display_fps():
+    fps = int(clock.get_fps())
+    enemy_count = len(enemies)
+
+    color = (255, 200, 100)
+    if fps < 30:
+        color = (255, 0, 0)
+
+    info = f"FPS: {fps} | Enemies: {enemy_count}"
+    screen.blit(font.render(info, True, color), (10, 130))
+
+    if fps < 20:
+        warning = font.render("SYSTEM OVERLOAD", True, (255, 0, 0))
+        screen.blit(warning, (WIDTH//2 - 100, 50))
+        
+# MAIN LOOP 
+while True:
+    dt = clock.tick(60) / 1000
+
+    pygame.event.pump()
+    events = pygame.event.get()
+
+    for event in events:
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                game_started = True
+                enemies.clear()
+                enemy_bullets.clear()
+                player_bullets.clear()
+
+                player.x, player.y = 380, 500
+                spawn_timer = 0
+                score = 0
+                game_over = False
+                time_elapsed = 0
+
+            elif event.key == pygame.K_SPACE and not game_over and game_started:
+                player_bullets.append(
+                    pygame.Rect(player.centerx, player.y, 6, 10)
+                )
+
+            elif event.key == pygame.K_r and game_over:
+                enemies.clear()
+                enemy_bullets.clear()
+                player_bullets.clear()
+
+                player.x, player.y = 380, 500
+                spawn_timer = 0
+                score = 0
+                game_over = False
+                time_elapsed = 0
+
+    if game_started and not game_over:
+        time_elapsed += dt
+
+        # scaling difference
+        if scaling_mode == 1:
+            difficulty = time_elapsed * 0.2  # weak
+        else:
+            difficulty = time_elapsed * 0.7  # strong
+
+        move_player(dt)
+        spawn_enemy(dt)
+        update_enemies()
+        update_enemy_bullets()
+        update_player_bullets()
+        check_collisions()
+
+    draw()
+
