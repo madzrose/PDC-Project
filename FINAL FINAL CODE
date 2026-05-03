@@ -43,7 +43,7 @@ time_elapsed = 0
 difficulty = 0
 
 
-#  PLAYER MOVEMENT -
+# PLAYER MOVEMENT
 def move_player(dt):
     keys = pygame.key.get_pressed()
     move_speed = 300
@@ -58,14 +58,14 @@ def move_player(dt):
         player.y += int(move_speed * dt)
 
 
-# ENEMY SPAWNING 
+# ENEMY SPAWNING
 def spawn_enemy(dt):
     global spawn_timer
 
     spawn_timer += dt * 1000
 
-    # spawn rate increases as difficulty increases
-    spawn_interval = max(250, 1000 - difficulty * 150)
+    # MORE AGGRESSIVE SCALING
+    spawn_interval = max(100, 1000 - difficulty * 300)
 
     if spawn_timer >= spawn_interval:
         new_enemy = pygame.Rect(random.randint(0, WIDTH - 40), 0, 40, 40)
@@ -73,7 +73,7 @@ def spawn_enemy(dt):
         spawn_timer = 0
 
 
-# GAME UPDATES 
+# GAME UPDATES
 def update_enemies():
     for enemy in enemies:
         enemy.y += 3  # constant movement speed
@@ -88,8 +88,8 @@ def update_enemies():
         if enemy.y > HEIGHT:
             enemies.remove(enemy)
 
-    # simulate extra workload (for FPS drop demonstration)
-    for _ in range(len(enemies) * 50):
+    # HEAVIER CPU LOAD (for demonstartion)
+    for _ in range(len(enemies) * 300):
         pass
 
 
@@ -132,7 +132,7 @@ def check_collisions():
                 break
 
 
-# DRAW EVERYTHING 
+# Screen
 def draw():
     if not game_started:
         screen.fill((20, 20, 20))
@@ -148,21 +148,17 @@ def draw():
 
     screen.fill((30, 30, 30))
 
-    # draw player
     pygame.draw.rect(screen, (0, 255, 0), player)
 
-    # draw enemies
     for enemy in enemies:
         pygame.draw.rect(screen, (255, 0, 0), enemy)
 
-    # draw bullets
     for bullet in enemy_bullets:
         pygame.draw.rect(screen, (255, 200, 0), bullet)
 
     for bullet in player_bullets:
         pygame.draw.rect(screen, (255, 255, 0), bullet)
 
-    # UI info
     screen.blit(font.render(f"Enemies: {len(enemies)}", True, (230, 230, 230)), (8, 35))
     screen.blit(font.render(f"Score: {score}", True, (230, 230, 230)), (8, 60))
 
@@ -171,7 +167,6 @@ def draw():
 
     display_fps()
 
-    # game over screen
     if game_over:
         pygame.draw.rect(screen, (50, 50, 50), (WIDTH//2 - 170, HEIGHT//2 - 30, 340, 120))
 
@@ -184,7 +179,7 @@ def draw():
     pygame.display.flip()
 
 
-#FPS DISPLAY 
+# FPS DISPLAY
 def display_fps():
     fps = int(clock.get_fps())
     enemy_count = len(enemies)
@@ -199,8 +194,9 @@ def display_fps():
     if fps < 20:
         warning = font.render("SYSTEM OVERLOAD", True, (255, 0, 0))
         screen.blit(warning, (WIDTH//2 - 100, 50))
-        
-# MAIN LOOP 
+
+
+# MAIN LOOP
 while True:
     dt = clock.tick(60) / 1000
 
@@ -244,11 +240,11 @@ while True:
     if game_started and not game_over:
         time_elapsed += dt
 
-        # scaling difference
+        #  STRONGER SCALING DIFFERENCe
         if scaling_mode == 1:
-            difficulty = time_elapsed * 0.2  # weak
+            difficulty = time_elapsed * 0.5   # weak
         else:
-            difficulty = time_elapsed * 0.7  # strong
+            difficulty = time_elapsed * 1.5   # strong
 
         move_player(dt)
         spawn_enemy(dt)
@@ -258,4 +254,3 @@ while True:
         check_collisions()
 
     draw()
-
